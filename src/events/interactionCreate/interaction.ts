@@ -18,10 +18,7 @@ export default async (interaction: BaseInteraction) => {
         (c) => c.name === interaction.commandName
       );
 
-      if (!command?.autocomplete)
-        return await interaction.respond([
-          { name: "Not setup yet", value: "" },
-        ]);
+      if (!command?.autocomplete) return;
 
       let response = await command.autocomplete(interaction);
 

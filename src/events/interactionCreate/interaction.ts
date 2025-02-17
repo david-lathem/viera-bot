@@ -8,8 +8,7 @@ export default async (interaction: BaseInteraction) => {
         (c) => c.name === interaction.commandName
       );
 
-      if (!command?.execute)
-        return await interaction.reply("Command is not setup yet!");
+      if (!command?.execute) throw new Error("Command is not setup yet!");
 
       await command.execute(interaction);
     }

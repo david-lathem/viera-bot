@@ -24,13 +24,9 @@ export default async (interaction: BaseInteraction) => {
 
       response = response.slice(0, 25);
 
-      if (response.every((r) => typeof r === "string")) {
-        return await interaction.respond(
-          response.map((r) => ({ name: r, value: r }))
-        );
-      }
-
-      await interaction.respond(response);
+      await interaction.respond(
+        response.map((r) => (typeof r === "string" ? { name: r, value: r } : r))
+      );
     }
   } catch (error) {
     console.log(error);

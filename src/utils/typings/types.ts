@@ -12,6 +12,6 @@ export interface extendedAPICommand
   guildOnly?: Boolean;
   autocomplete?(
     interaction: AutocompleteInteraction
-  ): Promise<Array<ApplicationCommandOptionChoiceData> | Array<string>>;
+  ): Promise<Array<ApplicationCommandOptionChoiceData | string>>;
   execute(interaction: ChatInputCommandInteraction): Promise<any>;
 }

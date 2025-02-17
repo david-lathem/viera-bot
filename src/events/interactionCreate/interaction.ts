@@ -1,4 +1,5 @@
 import { BaseInteraction } from "discord.js";
+import { handleInteractionError } from "../../utils/interaction.js";
 
 export default async (interaction: BaseInteraction) => {
   try {
@@ -29,6 +30,6 @@ export default async (interaction: BaseInteraction) => {
       );
     }
   } catch (error) {
-    console.log(error);
+    if (error instanceof Error) handleInteractionError(interaction, error);
   }
 };

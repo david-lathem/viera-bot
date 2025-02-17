@@ -1,24 +1,4 @@
-import {
-  BaseInteraction,
-  ChatInputCommandInteraction,
-  InteractionEditReplyOptions,
-  InteractionReplyOptions,
-  MessageComponentInteraction,
-  MessageFlags,
-} from "discord.js";
-
-export const replyOrEditInteraction = async (
-  interaction: ChatInputCommandInteraction | MessageComponentInteraction,
-  reply: InteractionReplyOptions | InteractionEditReplyOptions
-) => {
-  try {
-    if (interaction.replied || interaction.deferred)
-      await interaction.editReply(reply as InteractionEditReplyOptions);
-    else await interaction.reply(reply as InteractionReplyOptions);
-  } catch (error) {
-    console.log(error);
-  }
-};
+import { BaseInteraction, MessageFlags } from "discord.js";
 
 export const handleInteractionError = async (
   interaction: BaseInteraction,
@@ -26,13 +6,16 @@ export const handleInteractionError = async (
 ) => {
   console.log(error);
 
-  if (!interaction.isChatInputCommand() || !interaction.isMessageComponent())
+  if (!interaction.isChatInputCommand() && !interaction.isMessageComponent())
     return;
 
   const content = `Err! \`${error.message}\``;
 
-  await replyOrEditInteraction(interaction, {
-    content,
-    flags: MessageFlags.Ephemeral,
-  });
+  try {
+    if (interaction.deferred || interaction.replied)
+      await interaction.editReply(content);
+    else await interaction.reply({ content, flags: MessageFlags.Ephemeral });
+  } catch (error) {
+    console.log(error);
+  }
 };

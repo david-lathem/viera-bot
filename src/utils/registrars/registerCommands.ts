@@ -43,6 +43,8 @@ const registerAndAttachCommandsOnClient = async (client: Client<true>) => {
 
   // Import commands and cache the object as well as register them
 
+  const commandsToBeRegistered: Array<extendedAPICommand> = [];
+
   for (const commandPath of commandPaths) {
     const { default: commandData }: { default: extendedAPICommand } =
       await import(commandPath);
@@ -50,14 +52,17 @@ const registerAndAttachCommandsOnClient = async (client: Client<true>) => {
     if (!commandData)
       throw new Error(`${commandPath} does not export a command object`);
 
-    client.commands.push(commandData);
+    client.commands.push({ ...commandData });
+    commandsToBeRegistered.push({ ...commandData });
   }
 
-  if (client.commands.length === 0)
+  if (commandsToBeRegistered.length === 0)
     return console.log("No command found to be registered");
 
+  commandsToBeRegistered.forEach((c) => (c.permissionRequired = undefined));
+
   await client.rest.put(Routes.applicationCommands(client.user.id), {
-    body: client.commands,
+    body: commandsToBeRegistered,
   });
 };
 

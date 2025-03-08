@@ -4,7 +4,7 @@
 
     "module": "NodeNext" /* Specify what module code is generated. */,
 
-    // "rootDir": "src", // default longest path outside to non dt files i.e src/modules/app.ts, rootdir be src/modules and dist be app.ts only. If specified src then dist be modules/app.ts
+    "rootDir": "src", // default longest path outside to non dt files i.e src/modules/app.ts, rootdir be src/modules and dist be app.ts only. If specified src then dist be modules/app.ts
     "outDir": "dist", // if not specified, js files will be generated next to ts files
     "forceConsistentCasingInFileNames": true /* Ensure that casing is correct in imports. */,
     "resolveJsonModule": true, // Able to import json as ts doesnt do by default

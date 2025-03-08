@@ -10,6 +10,28 @@ export default async (interaction: BaseInteraction) => {
 
       if (!command?.execute) throw new Error("Command is not setup yet!");
 
+      if (command.guildOnly && !interaction.inGuild())
+        throw new Error("Command must be ran inside server only!");
+
+      // Check for permissions if set any
+      if (command.permissionRequired && interaction.inCachedGuild()) {
+        // If only specified single perm
+        if (typeof command.permissionRequired === "bigint") {
+          if (!interaction.member.permissions.has(command.permissionRequired))
+            throw new Error("You do not have enough perms to run the command!");
+        }
+
+        // If specified array of perms
+        if (Array.isArray(command.permissionRequired)) {
+          const hasPerm = command.permissionRequired.some((p) =>
+            interaction.member.permissions.has(p)
+          );
+
+          if (!hasPerm)
+            throw new Error("You do not have enough perms to run the command!");
+        }
+      }
+
       await command.execute(interaction);
     }
 

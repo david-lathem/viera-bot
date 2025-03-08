@@ -2,13 +2,12 @@ import {
   ApplicationCommandOptionChoiceData,
   AutocompleteInteraction,
   ChatInputCommandInteraction,
-  PermissionFlags,
   RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord.js";
 
 export interface extendedAPICommand
   extends RESTPostAPIChatInputApplicationCommandsJSONBody {
-  permissionRequired?: PermissionFlags | Array<PermissionFlags>;
+  permissionRequired?: bigint | Array<bigint>;
   guildOnly?: Boolean;
   autocomplete?(
     interaction: AutocompleteInteraction

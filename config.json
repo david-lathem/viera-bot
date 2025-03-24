@@ -1,0 +1,72 @@
+[
+  {
+    "name": "AK-47",
+    "kaosId": "riffle.ak",
+    "quantity": 10,
+    "odds": 20,
+    "3xWin": true,
+
+    "type": "ITEM"
+  },
+  {
+    "name": "M249",
+    "kaosId": "lmg.m249",
+    "quantity": 2,
+    "odds": 15,
+    "3xWin": true,
+
+    "type": "ITEM"
+  },
+  {
+    "name": "L96",
+    "kaosId": "riffle.l96",
+    "quantity": 3,
+    "odds": 20,
+    "3xWin": true,
+
+    "type": "ITEM"
+  },
+  {
+    "name": "Charcoal",
+    "kaosId": "charcoal",
+    "quantity": 1,
+    "odds": 25,
+    "3xWin": true,
+
+    "type": "ITEM"
+  },
+  {
+    "name": "Rocket",
+    "kaosId": "ammo.rocket.basic",
+    "quantity": 10,
+    "odds": 5,
+    "3xWin": true,
+
+    "type": "ITEM"
+  },
+  {
+    "name": "C4",
+    "kaosId": "explosive.timed",
+    "quantity": 5,
+    "odds": 5,
+    "3xWin": true,
+    "type": "ITEM"
+  },
+  {
+    "name": "Airdrop",
+    "kaosId": "supply.signal",
+    "quantity": 2,
+    "odds": 10,
+    "3xWin": true,
+
+    "type": "ITEM"
+  },
+  {
+    "name": "Hiroshima",
+    "kaosId": "supply.signal",
+    "quantity": 2,
+    "odds": 1,
+    "3xWin": false,
+    "type": "POINTS"
+  }
+]

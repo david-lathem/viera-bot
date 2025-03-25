@@ -8,6 +8,8 @@ import db from "../database/index.js";
 import { extendedAPICommand } from "../utils/typings/types.js";
 import config from "./../../config.json" with { type: "json" };
 import path from "path";
+import { isAuthorizedServer } from "../utils/perms.js";
+import { removeRoleWhenTicketZero } from "../utils/misc.js";
 
 interface LootItem {
   name: string;
@@ -30,6 +32,8 @@ export default {
         "This command can only be used in a server."
       );
     }
+
+    isAuthorizedServer(interaction.guild);
 
     const guildId = interaction.guildId;
     const userId = interaction.user.id;
@@ -76,40 +80,90 @@ export default {
       userId
     );
 
+    await removeRoleWhenTicketZero(interaction.member, userData.tickets - 1);
     const rolledItem = rollItem(config);
-    const embed = new EmbedBuilder()
-      .setTitle("🎲 Roll Results! 🎲")
-      .setColor(0x7316de)
-      .addFields([
-        { name: "🛠 Item", value: rolledItem.name, inline: true },
-        {
-          name: "📦 Quantity",
-          value: String(rolledItem.quantity),
-          inline: true,
-        },
-      ])
-      .setImage(`attachment://${rolledItem.kaosId}.webp`)
-      .setFooter({ text: `Tickets: ${userData.tickets - 1}` });
 
-    const odds = Array(1000 * 100).fill(0);
+    const rollDuration = 1000 * 7; // In seconds rolling effect
+    const rollInterval = 1000; // Change item every 500ms
+    const steps = Math.round(rollDuration / rollInterval); // Number of steps in rolling
+    let currentStep = 0;
 
-    const randomIndex = Math.floor(Math.random() * odds.length);
+    console.log(steps);
+    const updateEmbed = async () => {
+      try {
+        if (currentStep < steps) {
+          console.log(currentStep);
 
-    const typeStr = rolledItem.type === "ITEM" ? `[${rolledItem.kaosId}]` : "";
-    let quantity = rolledItem.type === "ITEM" ? rolledItem.quantity : 5000000;
+          const randomItem = config[Math.floor(Math.random() * config.length)];
 
-    if (randomIndex === 1 && rolledItem["3xWin"] === true) {
-      quantity *= 3;
-    }
+          const rollingEmbed = new EmbedBuilder()
+            .setTitle("🎲 Rolling... 🎲")
+            .setColor(0x7316de)
 
-    await channel.send({
-      content: `[KAOS][ADD][<@${interaction.user.id}>][ALL]=[${rolledItem.type}]${typeStr}[${quantity}]`,
-    });
+            .setImage(`attachment://${randomItem.kaosId}.webp`)
+            .setFooter({ text: "Rolling..." });
 
-    await interaction.reply({
-      embeds: [embed],
-      files: [path.join("assets", rolledItem.kaosId + ".webp")],
-    });
+          const data = {
+            embeds: [rollingEmbed],
+            files: [path.join("assets", randomItem.kaosId + ".webp")],
+          };
+
+          if (!interaction.replied) await interaction.reply(data);
+
+          if (interaction.replied) await interaction.editReply(data);
+
+          currentStep++;
+
+          console.log(randomItem.name);
+
+          setTimeout(updateEmbed, rollInterval);
+        } else {
+          console.log("ehh");
+
+          // Final item display
+          const finalEmbed = new EmbedBuilder()
+            .setTitle("🎉 You won! 🎉")
+            .setColor(0x00ff00)
+            .addFields([
+              { name: "🛠 Item", value: rolledItem.name, inline: true },
+              {
+                name: "📦 Quantity",
+                value: String(rolledItem.quantity),
+                inline: true,
+              },
+            ])
+            .setImage(`attachment://${rolledItem.kaosId}.webp`)
+            .setFooter({ text: "Congratulations!" });
+
+          await interaction.editReply({
+            files: [path.join("assets", rolledItem.kaosId + ".webp")],
+            embeds: [finalEmbed],
+          });
+
+          const odds = Array(1000 * 100).fill(0);
+
+          const randomIndex = Math.floor(Math.random() * odds.length);
+
+          const isNotHiroshima =
+            rolledItem.type === "ITEM" || rolledItem.type === "KIT";
+
+          const typeStr = isNotHiroshima ? `[${rolledItem.kaosId}]` : "";
+          let quantity = isNotHiroshima ? rolledItem.quantity : 5000000;
+
+          if (randomIndex === 1 && rolledItem["3xWin"] === true) {
+            quantity *= 3;
+          }
+
+          await channel.send({
+            content: `[KAOS][ADD][<@${interaction.user.id}>][ALL]=[${rolledItem.type}]${typeStr}[${quantity}]`,
+          });
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    updateEmbed();
   },
 } satisfies extendedAPICommand;
 
@@ -117,12 +171,8 @@ function rollItem(lootTable: LootItem[]): LootItem {
   const weightedList = lootTable.flatMap((item) =>
     Array(item.odds).fill(item.name)
   );
-  console.log(weightedList);
 
   const randomIndex = Math.floor(Math.random() * weightedList.length);
-  console.log(randomIndex);
-  console.log(weightedList[randomIndex]);
-
   const winner = weightedList[randomIndex];
 
   return lootTable.find((t) => t.name === winner)!;

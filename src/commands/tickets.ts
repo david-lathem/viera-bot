@@ -1,5 +1,6 @@
 import db from "../database/index.js";
-import { isAdmin } from "../utils/perms.js";
+import { removeRoleWhenTicketZero } from "../utils/misc.js";
+import { isAdmin, isAuthorizedServer } from "../utils/perms.js";
 import { extendedAPICommand } from "../utils/typings/types.js";
 import {
   ChatInputCommandInteraction,
@@ -102,6 +103,8 @@ export default {
     const recipient = interaction.options.getUser("to");
     const amount = interaction.options.getInteger("amount");
 
+    isAuthorizedServer(interaction.guild);
+
     if (subcommand !== "view" && subcommand !== "leaderboards")
       isAdmin(interaction.member);
 
@@ -130,11 +133,19 @@ export default {
       );
     }
 
-    if (subcommand === "remove" && user) {
+    if (subcommand === "remove" && user && amount) {
+      const senderId = interaction.user.id;
+
       db.prepare("UPDATE users SET tickets = tickets - ? WHERE userId = ?").run(
         amount,
         user.id
       );
+
+      const senderData = db
+        .prepare<{}, UserData>("SELECT tickets FROM users WHERE userId = ?")
+        .get(senderId);
+
+      await removeRoleWhenTicketZero(interaction.member, senderData!.tickets);
 
       return await interaction.reply(
         `Removed ${amount} tickets from ${user.username}.`
@@ -163,6 +174,11 @@ export default {
       });
 
       transaction();
+
+      await removeRoleWhenTicketZero(
+        interaction.member,
+        senderData.tickets - amount
+      );
 
       return await interaction.reply(
         `Transferred ${amount} tickets to ${recipient.username}.`

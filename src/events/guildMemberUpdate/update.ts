@@ -1,4 +1,4 @@
-import { GuildMember, Role } from "discord.js";
+import { AuditLogEvent, GuildMember, Role } from "discord.js";
 import db from "../../database/index.js";
 
 export default async (oldMember: GuildMember, updatedMember: GuildMember) => {
@@ -39,6 +39,16 @@ export default async (oldMember: GuildMember, updatedMember: GuildMember) => {
     }
 
     if (totalTicketsAdded > 0 || totalTicketsRemoved > 0) {
+      const logs =
+        await updatedMember.guild.fetchAuditLogs<AuditLogEvent.MemberRoleUpdate>(
+          { type: AuditLogEvent.MemberRoleUpdate }
+        );
+
+      const event = logs.entries.find((e) => e.targetId === updatedMember.id);
+
+      if (event?.executorId === oldMember.client.user.id)
+        return console.log("Bot updated the roles, returning!");
+
       const userId = updatedMember.id;
       db.prepare(
         `INSERT INTO users (userId, tickets) VALUES (?, ?) 

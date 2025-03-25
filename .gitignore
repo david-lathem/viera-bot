@@ -3,4 +3,3 @@ node_modules
 dist
 *lock.json
 *.db
-config.json

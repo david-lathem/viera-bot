@@ -133,7 +133,7 @@ export default {
               },
             ])
             .setImage(`attachment://${rolledItem.kaosId}.webp`)
-            .setFooter({ text: "Congratulations!" });
+            .setFooter({ text: `Tickets remaning: ${userData.tickets - 1}` });
 
           await interaction.editReply({
             files: [path.join("assets", rolledItem.kaosId + ".webp")],

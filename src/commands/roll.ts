@@ -91,8 +91,16 @@ export default {
       .setImage(`attachment://${rolledItem.kaosId}.webp`)
       .setFooter({ text: `Tickets: ${userData.tickets - 1}` });
 
+    const odds = Array(1000 * 100).fill(0);
+
+    const randomIndex = Math.floor(Math.random() * odds.length);
+
     const typeStr = rolledItem.type === "ITEM" ? `[${rolledItem.kaosId}]` : "";
-    const quantity = rolledItem.type === "ITEM" ? rolledItem.quantity : 5000000;
+    let quantity = rolledItem.type === "ITEM" ? rolledItem.quantity : 5000000;
+
+    if (randomIndex === 1 && rolledItem["3xWin"] === true) {
+      quantity *= 3;
+    }
 
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][ALL]=[${rolledItem.type}]${typeStr}[${quantity}]`,

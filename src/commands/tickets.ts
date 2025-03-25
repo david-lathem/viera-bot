@@ -69,6 +69,25 @@ export default {
       ],
     },
     {
+      name: "transfer",
+      description: "Transfer tickets to another user.",
+      type: ApplicationCommandOptionType.Subcommand,
+      options: [
+        {
+          name: "to",
+          description: "The user to transfer tickets to",
+          type: ApplicationCommandOptionType.User,
+          required: true,
+        },
+        {
+          name: "amount",
+          description: "Number of tickets to transfer",
+          type: ApplicationCommandOptionType.Integer,
+          required: true,
+        },
+      ],
+    },
+    {
       name: "leaderboards",
       description: "View the top users with the most tickets.",
       type: ApplicationCommandOptionType.Subcommand,
@@ -80,6 +99,7 @@ export default {
 
     const subcommand = interaction.options.getSubcommand();
     const user = interaction.options.getUser("user");
+    const recipient = interaction.options.getUser("to");
     const amount = interaction.options.getInteger("amount");
 
     if (subcommand !== "view" && subcommand !== "leaderboards")
@@ -118,6 +138,34 @@ export default {
 
       return await interaction.reply(
         `Removed ${amount} tickets from ${user.username}.`
+      );
+    }
+    if (subcommand === "transfer" && recipient && amount) {
+      const senderId = interaction.user.id;
+
+      const senderData = db
+        .prepare<{}, UserData>("SELECT tickets FROM users WHERE userId = ?")
+        .get(senderId);
+
+      if (!senderData || senderData.tickets < amount) {
+        return await interaction.reply(
+          "You don't have enough tickets to transfer."
+        );
+      }
+
+      const transaction = db.transaction(() => {
+        db.prepare(
+          "UPDATE users SET tickets = tickets - ? WHERE userId = ?"
+        ).run(amount, senderId);
+        db.prepare(
+          "INSERT INTO users (userId, tickets) VALUES (?, ?) ON CONFLICT(userId) DO UPDATE SET tickets = tickets + ?"
+        ).run(recipient.id, amount, amount);
+      });
+
+      transaction();
+
+      return await interaction.reply(
+        `Transferred ${amount} tickets to ${recipient.username}.`
       );
     }
 

@@ -190,7 +190,7 @@ export default {
         .prepare<
           {},
           UserData
-        >("SELECT userId, tickets FROM users ORDER BY tickets DESC")
+        >("SELECT userId, tickets FROM users WHERE tickets > 0 ORDER BY tickets DESC")
         .all({});
 
       if (topUsers.length === 0) {

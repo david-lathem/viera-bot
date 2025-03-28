@@ -9,6 +9,8 @@ const client = new Client({
 
 client.commands = [];
 
+client.rest.on("rateLimited", console.log);
+
 await registerEventsOnClient(client);
 
 client.login(process.env.TOKEN);

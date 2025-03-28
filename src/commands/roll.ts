@@ -1,4 +1,5 @@
 import {
+  ApplicationCommandOptionType,
   ChatInputCommandInteraction,
   EmbedBuilder,
   TextChannel,
@@ -24,6 +25,18 @@ export default {
   name: "roll",
   description: "Roll for a random item using your tickets.",
 
+  options: [
+    {
+      name: "server_number",
+      description: "Choose a server number (1-13).",
+      type: ApplicationCommandOptionType.String,
+      required: true,
+      choices: Array.from({ length: 13 }, (_, i) => ({
+        name: (i + 1).toString(),
+        value: i + 1 + "",
+      })),
+    },
+  ],
   execute: async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.inCachedGuild()) return;
 
@@ -38,11 +51,16 @@ export default {
     const guildId = interaction.guildId;
     const userId = interaction.user.id;
 
+    const serverNumber = interaction.options.getString("server_number", true);
+
     const guildSettings = db
       .prepare<
         {},
-        { guildId: string; kaosCommandChannelId: string }
-      >("SELECT kaosCommandChannelId FROM guildSettings WHERE guildId = ?")
+        {
+          guildId: string;
+          kaosCommandChannelId?: string;
+        }
+      >("SELECT * FROM guildSettings WHERE guildId = ?")
       .get(guildId);
 
     if (!guildSettings || !guildSettings.kaosCommandChannelId) {
@@ -122,8 +140,12 @@ export default {
 
           // Final item display
           const finalEmbed = new EmbedBuilder()
-            .setTitle("🎉 You won! 🎉")
-            .setColor(0x00ff00)
+            .setTitle(
+              rolledItem.kaosId !== "charcoal"
+                ? "🎉 You won! 🎉"
+                : "You lost 😥"
+            )
+            .setColor(rolledItem.kaosId !== "charcoal" ? 0x00ff00 : "Red")
             .addFields([
               { name: "🛠 Item", value: rolledItem.name, inline: true },
               {
@@ -132,6 +154,7 @@ export default {
                 inline: true,
               },
             ])
+
             .setImage(`attachment://${rolledItem.kaosId}.webp`)
             .setFooter({ text: `Tickets remaning: ${userData.tickets - 1}` });
 
@@ -155,7 +178,7 @@ export default {
           }
 
           await channel.send({
-            content: `[KAOS][ADD][<@${interaction.user.id}>][ALL]=[${rolledItem.type}]${typeStr}[${quantity}]`,
+            content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[${rolledItem.type}]${typeStr}[${quantity}]`,
           });
         }
       } catch (error) {

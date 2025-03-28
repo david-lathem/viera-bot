@@ -27,7 +27,7 @@
     "name": "Charcoal",
     "kaosId": "charcoal",
     "quantity": 1,
-    "odds": 25,
+    "odds": 30,
     "3xWin": true,
     "type": "ITEM"
   },
@@ -83,15 +83,15 @@
     "name": "Boom Kit",
     "kaosId": "elitekit11",
     "quantity": 1,
-    "odds": 2,
-    "3xWin": true,
+    "odds": 1,
+    "3xWin": false,
     "type": "KIT"
   },
   {
     "name": "VIP Kit",
     "kaosId": "vipkit",
     "quantity": 1,
-    "odds": 5,
+    "odds": 25,
     "3xWin": true,
     "type": "KIT"
   },
@@ -99,7 +99,7 @@
     "name": "Bradley Kit",
     "kaosId": "elitekit3",
     "quantity": 1,
-    "odds": 8,
+    "odds": 25,
     "3xWin": true,
     "type": "KIT"
   }

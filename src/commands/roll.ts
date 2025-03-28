@@ -127,8 +127,7 @@ export default {
           };
 
           if (!interaction.replied) await interaction.reply(data);
-
-          if (interaction.replied) await interaction.editReply(data);
+          else await interaction.editReply(data);
 
           currentStep++;
 

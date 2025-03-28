@@ -154,11 +154,16 @@ export default {
               },
             ])
 
+            .setThumbnail(`attachment://embed_thumbnail.webp`)
+
             .setImage(`attachment://${rolledItem.kaosId}.webp`)
             .setFooter({ text: `Tickets remaning: ${userData.tickets - 1}` });
 
           await interaction.editReply({
-            files: [path.join("assets", rolledItem.kaosId + ".webp")],
+            files: [
+              path.join("assets", rolledItem.kaosId + ".webp"),
+              path.join("assets", "embed_thumbnail" + ".webp"),
+            ],
             embeds: [finalEmbed],
           });
 

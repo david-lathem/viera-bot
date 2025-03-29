@@ -17,3 +17,9 @@ db.exec(
   )
 `
 );
+
+// db.exec(
+//   `
+//  ALTER TABLE guildSettings ADD ticketChannelId TEXT
+// `
+// );

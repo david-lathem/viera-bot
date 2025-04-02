@@ -181,7 +181,7 @@ export default {
       const raceStatus = raceTrack
         .map(
           (boat) =>
-            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}:5555~1: ${
+            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}<:5555~1:> ${
               boat.finished ? `🏁 (Place: ${boat.place})` : ""
             }`
         )
@@ -195,9 +195,9 @@ export default {
     const won = userFinish!.place === 1;
 
     await interaction.followUp(
-      `🎉 **RHIB ${userFinish!.id} finished in position ${userFinish!.place}!** ${
+      `🎉 **RHIB ${userFinish!.id} finished in position ${userFinish!.place}! ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
-      }.Thanks for playing KING's Race. Tickets left: ${userData.tickets - 1}`
+      }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${userData.tickets - 1}**`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.quantity}]`,

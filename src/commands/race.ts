@@ -25,9 +25,17 @@ const colorMap = {
   5: "🟣",
 };
 
+const colorMapName = {
+  1: "RED",
+  2: "BLUE",
+  3: "GREEN",
+  4: "YELLOW",
+  5: "PURPLE",
+};
+
 export default {
   name: "race",
-  description: "race using rhibs!",
+  description: "Race using rhibs! Takes one ticket!",
 
   options: [
     {
@@ -46,7 +54,7 @@ export default {
       type: ApplicationCommandOptionType.Integer,
       required: true,
       choices: Array.from({ length: 5 }, (_, i) => ({
-        name: (i + 1).toString(),
+        name: colorMapName[(i + 1) as 1 | 2 | 3 | 4 | 5] + " RHIB",
         value: i + 1,
       })),
     },
@@ -173,7 +181,7 @@ export default {
       const raceStatus = raceTrack
         .map(
           (boat) =>
-            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}<:5555~1:1356949815837200465> ${
+            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}:5555: ${
               boat.finished ? `🏁 (Place: ${boat.place})` : ""
             }`
         )
@@ -189,7 +197,7 @@ export default {
     await interaction.followUp(
       `🎉 **RHIB ${userFinish!.id} finished in position ${userFinish!.place}!** ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
-      }`
+      }.Thanks for playing KING's Race. Tickets left: ${userData.tickets - 1}`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.quantity}]`,

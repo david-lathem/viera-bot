@@ -195,7 +195,7 @@ export default {
     const won = userFinish!.place === 1;
 
     await interaction.followUp(
-      `🎉 **RHIB ${userFinish!.id} finished in position ${userFinish!.place}! ${
+      `🎉 **RHIB ${colorMap[userFinish!.id]} finished in position ${userFinish!.place}! ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
       }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${userData.tickets - 1}**`
     );

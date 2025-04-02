@@ -1,0 +1,27 @@
+[
+  {
+    "position": 1,
+    "quantity": 1000000,
+    "odds": 5
+  },
+  {
+    "position": 2,
+    "quantity": 250000,
+    "odds": 15
+  },
+  {
+    "position": 3,
+    "quantity": 60000,
+    "odds": 30
+  },
+  {
+    "position": 4,
+    "quantity": 30000,
+    "odds": 40
+  },
+  {
+    "position": 5,
+    "quantity": 15000,
+    "odds": 50
+  }
+]

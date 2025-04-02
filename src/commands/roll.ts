@@ -40,12 +40,6 @@ export default {
   execute: async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.inCachedGuild()) return;
 
-    if (!interaction.guildId) {
-      return await interaction.reply(
-        "This command can only be used in a server."
-      );
-    }
-
     isAuthorizedServer(interaction.guild);
 
     const guildId = interaction.guildId;

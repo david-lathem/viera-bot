@@ -181,7 +181,7 @@ export default {
       const raceStatus = raceTrack
         .map(
           (boat) =>
-            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}"<:5555~1:1356949815837200465>" ${
+            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}<:rhib:1356949815837200465> ${
               boat.finished ? `🏁 (Place: ${boat.place})` : ""
             }`
         )

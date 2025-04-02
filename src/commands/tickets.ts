@@ -6,11 +6,14 @@ import {
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
   User,
+  time,
+  TimestampStyles,
 } from "discord.js";
 
 interface UserData {
   userId: string;
   tickets: number;
+  lastDailyClaimedTimestamp: null | number;
 }
 
 export default {
@@ -18,6 +21,11 @@ export default {
   description: "Manage user tickets.",
   guildOnly: true,
   options: [
+    {
+      name: "daily",
+      description: "Claim your daily ticket",
+      type: ApplicationCommandOptionType.Subcommand,
+    },
     {
       name: "view",
       description: "View a user's ticket count.",
@@ -105,8 +113,44 @@ export default {
 
     isAuthorizedServer(interaction.guild);
 
-    if (subcommand !== "view" && subcommand !== "leaderboards")
+    if (
+      subcommand !== "view" &&
+      subcommand !== "leaderboards" &&
+      subcommand !== "daily"
+    )
       isAdmin(interaction.member);
+
+    if (subcommand === "daily") {
+      const { user } = interaction;
+      const userData = db
+        .prepare<
+          {
+            userId: string;
+          },
+          UserData
+        >("SELECT * FROM users WHERE userId = @userId")
+        .get({ userId: user.id });
+
+      const curDate = Date.now();
+
+      const dayInMs = 24 * 60 * 60 * 1000;
+      if (
+        userData?.lastDailyClaimedTimestamp &&
+        userData.lastDailyClaimedTimestamp + dayInMs > curDate
+      ) {
+        return await interaction.reply(
+          `You have already claimed your daily ticket. Next claim at ${time(new Date(userData.lastDailyClaimedTimestamp + dayInMs), TimestampStyles.ShortDateTime)}`
+        );
+      }
+
+      db.prepare(
+        "INSERT INTO users (userId, tickets, lastDailyClaimedTimestamp) VALUES (?, 1,  ?) ON CONFLICT(userId) DO UPDATE SET tickets = tickets + 1 , lastDailyClaimedTimestamp = ?"
+      ).run(user.id, curDate, curDate);
+
+      return await interaction.reply(
+        `You now have ${userData?.tickets! + 1} tickets. Next claim at ${time(new Date(curDate + dayInMs), TimestampStyles.ShortDateTime)}`
+      );
+    }
 
     if (subcommand === "view" && user) {
       const userData = db

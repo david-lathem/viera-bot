@@ -116,6 +116,7 @@ export default {
     if (
       subcommand !== "view" &&
       subcommand !== "leaderboards" &&
+      subcommand !== "transfer" &&
       subcommand !== "daily"
     )
       isAdmin(interaction.member);

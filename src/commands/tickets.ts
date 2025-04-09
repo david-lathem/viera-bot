@@ -1,3 +1,8 @@
+import {
+  ButtonStyles,
+  ButtonTypes,
+  pagination,
+} from "@devraelfreeze/discordjs-pagination";
 import db from "../database/index.js";
 import { removeRoleWhenTicketZero } from "../utils/misc.js";
 import { isAdmin, isAuthorizedServer } from "../utils/perms.js";
@@ -8,6 +13,7 @@ import {
   User,
   time,
   TimestampStyles,
+  EmbedBuilder,
 } from "discord.js";
 
 interface UserData {
@@ -242,11 +248,61 @@ export default {
         return await interaction.reply("No users have tickets yet.");
       }
 
-      const leaderboard = topUsers
-        .map((u, i) => `${i + 1}. <@${u.userId}> : ${u.tickets} tickets`)
-        .join("\n");
+      const arrayEmbeds: Array<EmbedBuilder> = [];
 
-      return await interaction.reply(`**Ticket Leaderboard:**\n${leaderboard}`);
+      const usersPerPage = 10;
+      const totalPages = Math.ceil(topUsers.length / usersPerPage);
+
+      for (let page = 0; page < totalPages; page++) {
+        const start = page * usersPerPage;
+        const end = start + usersPerPage;
+        const currentUsers = topUsers.slice(start, end);
+
+        const description = currentUsers
+          .map((user, index) => {
+            const rank = start + index + 1;
+            return `**${rank}.** <@${user.userId}> — 🎟️ ${user.tickets} tickets`;
+          })
+          .join("\n");
+
+        const embed = new EmbedBuilder()
+          .setTitle(`🎉 Ticket Leaderboard — Page ${page + 1}/${totalPages}`)
+          .setDescription(description)
+          .setColor("Random") // or use a specific color like 0x5865F2
+          .setThumbnail(interaction.guild.iconURL()); // optional
+
+        arrayEmbeds.push(embed);
+      }
+
+      // const leaderboard = topUsers
+      //   .map((u, i) => `${i + 1}. <@${u.userId}> : ${u.tickets} tickets`)
+      //   .join("\n");
+
+      // @ts-ignore
+      await pagination({
+        embeds: arrayEmbeds /** Array of embeds objects */,
+        author: interaction.member.user,
+        interaction: interaction,
+        ephemeral: true,
+        time: 1000 * 60 /** 40 seconds */,
+        disableButtons: true /** Remove buttons after timeout */,
+        fastSkip: false,
+        pageTravel: false,
+        buttons: [
+          {
+            type: ButtonTypes.previous,
+            label: "Previous Page",
+            style: ButtonStyles.Primary,
+          },
+          {
+            type: ButtonTypes.next,
+            label: "Next Page",
+            style: ButtonStyles.Success,
+          },
+        ],
+      });
+
+      // return await interaction.reply(`**Ticket Leaderboard:**\n${leaderboard}`);
     }
   },
 } satisfies extendedAPICommand;

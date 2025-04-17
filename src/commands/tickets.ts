@@ -84,6 +84,26 @@ export default {
       ],
     },
     {
+      name: "mass-give",
+      description: "Give tickets to every member with a specific role.",
+      type: ApplicationCommandOptionType.Subcommand,
+      options: [
+        {
+          name: "role",
+          description: "The role to target",
+          type: ApplicationCommandOptionType.Role,
+          required: true,
+        },
+        {
+          name: "amount",
+          description: "Number of tickets to give",
+          type: ApplicationCommandOptionType.Integer,
+          required: true,
+        },
+      ],
+    },
+
+    {
       name: "transfer",
       description: "Transfer tickets to another user.",
       type: ApplicationCommandOptionType.Subcommand,
@@ -202,6 +222,32 @@ export default {
         `Removed ${amount} tickets from ${user.username}.`
       );
     }
+
+    if (subcommand === "mass-give") {
+      const role = interaction.options.getRole("role", true);
+      const amount = interaction.options.getInteger("amount", true);
+
+      const members = [...role.members.values()];
+
+      if (members.length === 0) {
+        return await interaction.reply("That role has no members.");
+      }
+
+      const transaction = db.transaction(() => {
+        for (const member of members) {
+          db.prepare(
+            "INSERT INTO users (userId, tickets) VALUES (?, ?) ON CONFLICT(userId) DO UPDATE SET tickets = tickets + ?"
+          ).run(member.id, amount, amount);
+        }
+      });
+
+      transaction();
+
+      return await interaction.reply(
+        `Successfully gave ${amount} tickets to ${members.length} member(s) with the ${role.name} role.`
+      );
+    }
+
     if (subcommand === "transfer" && recipient && amount) {
       const senderId = interaction.user.id;
 

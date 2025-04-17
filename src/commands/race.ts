@@ -35,7 +35,7 @@ const colorMapName = {
 
 export default {
   name: "race",
-  description: "Race using rhibs! Takes one ticket!",
+  description: "Race using rhibs!",
 
   options: [
     {
@@ -77,6 +77,7 @@ export default {
         {
           guildId: string;
           kaosCommandChannelId?: string;
+          racePrice: number | null;
         }
       >("SELECT * FROM guildSettings WHERE guildId = ?")
       .get(guildId);
@@ -106,13 +107,14 @@ export default {
       >("SELECT tickets FROM users WHERE userId = ?")
       .get(userId);
 
-    if (!userData || userData.tickets < 1) {
+    if (!userData || userData.tickets < (guildSettings.racePrice ?? 1)) {
       return await interaction.reply({
-        content: "You do not have enough tickets to race !",
+        content: `You must have at least ${guildSettings.racePrice ?? 1} tickets to race!`,
       });
     }
 
-    db.prepare("UPDATE users SET tickets = tickets - 1 WHERE userId = ?").run(
+    db.prepare("UPDATE users SET tickets = tickets - ? WHERE userId = ?").run(
+      guildSettings.racePrice ?? 1,
       userId
     );
 
@@ -197,7 +199,7 @@ export default {
     await interaction.followUp(
       `🎉 **RHIB ${colorMap[userFinish!.id]} finished in position ${userFinish!.place}! ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
-      }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${userData.tickets - 1}**`
+      }**\n**__Thanks for playing KING's Race. You will receive ${userRandomPos.quantity} points.__** **Tickets left: ${userData.tickets - (guildSettings.racePrice ?? 1)}**`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.quantity}]`,

@@ -23,8 +23,15 @@ db.exec(
 //  ALTER TABLE guildSettings ADD ticketChannelId TEXT
 // `
 // );
+
 // db.exec(
 //   `
 //  ALTER TABLE users ADD lastDailyClaimedTimestamp INTEGER
+// `
+// );
+
+// db.exec(
+//   `
+//  ALTER TABLE guildSettings ADD racePrice INTEGER
 // `
 // );

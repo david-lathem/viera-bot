@@ -199,7 +199,7 @@ export default {
     await interaction.followUp(
       `🎉 **RHIB ${colorMap[userFinish!.id]} finished in position ${userFinish!.place}! ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
-      }**\n**__Thanks for playing KING's Race. You will receive ${userRandomPos.quantity} points.__** **Tickets left: ${userData.tickets - (guildSettings.racePrice ?? 1)}**`
+      }**\n**__Thanks for playing KING's Race. You will receive ${userRandomPos.quantity} percs.__** **Tickets left: ${userData.tickets - (guildSettings.racePrice ?? 1)}**`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.quantity}]`,

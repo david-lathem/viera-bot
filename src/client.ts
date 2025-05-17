@@ -1,3 +1,11 @@
+import dotenv from "dotenv";
+import path from "node:path";
+
+const __dirname = import.meta.dirname;
+
+dotenv.config({ path: path.join(__dirname, "..", ".env") });
+
+// had to put this import in client.ts not index.ts becaause the code wont be processed since imports are handled frist
 import { Client, GatewayIntentBits, Partials } from "discord.js";
 
 import registerEventsOnClient from "./utils/registrars/registerEvents.js";

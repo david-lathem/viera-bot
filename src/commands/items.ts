@@ -39,7 +39,7 @@ export default {
         },
         {
           type: ApplicationCommandOptionType.String,
-          name: "kaos_id",
+          name: "item_id",
           description: "The internal Kaos ID used to reference the item",
           required: true,
         },
@@ -81,7 +81,7 @@ export default {
       options: [
         {
           type: ApplicationCommandOptionType.String,
-          name: "kaos_id",
+          name: "item_id",
           description: "the kaos id",
           required: true,
         },
@@ -120,13 +120,11 @@ export default {
 
     if (sub === "add") {
       const name = interaction.options.getString("name", true);
-      const kaosId = interaction.options.getString("kaos_id", true);
+      const kaosId = interaction.options.getString("item_id", true);
       const quantity = interaction.options.getInteger("quantity", true);
       const odds = interaction.options.getInteger("odds", true);
       const type = interaction.options.getString("type", true) as KaosItemType;
       const threeXWin = interaction.options.getBoolean("win3x_mode", true);
-
-      console.log(threeXWin);
 
       const existing = getKaosItem.get({ guildId, kaosId });
 
@@ -147,7 +145,7 @@ export default {
     }
 
     if (sub === "remove") {
-      const kaosId = interaction.options.getString("kaos_id", true);
+      const kaosId = interaction.options.getString("item_id", true);
       const result = deleteKaosItem.run({ guildId, kaosId });
 
       if (result.changes === 0)

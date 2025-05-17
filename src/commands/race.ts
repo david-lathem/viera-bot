@@ -5,9 +5,9 @@ import {
 } from "discord.js";
 
 import db from "../database/index.js";
-import { extendedAPICommand, RaceReward, } from "../utils/typings/types.js";
+import { extendedAPICommand, RaceReward } from "../utils/typings/types.js";
 import raceData from "./../../race.json" with { type: "json" };
-import { getGuildById } from "../database/queries.js";
+import { getGuildRowThrowErrIfNot } from "../utils/database.js";
 
 interface Boat {
   id: 1 | 2 | 3 | 4 | 5;
@@ -61,7 +61,6 @@ export default {
   execute: async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.inCachedGuild()) return;
 
-
     const { user, guildId } = interaction;
 
     const userId = user.id;
@@ -69,10 +68,9 @@ export default {
     const serverNumber = interaction.options.getString("server_number", true);
     const rhib = interaction.options.getInteger("rhib", true);
 
-    const guildSettings =getGuildById
-      .get({guildId});
+    const guildSettings = getGuildRowThrowErrIfNot(guildId);
 
-    if (!guildSettings || !guildSettings.kaosCommandChannelId) {
+    if (!guildSettings.kaosCommandChannelId) {
       return await interaction.reply({
         content:
           "This server has not set a Kaos command channel. Use `/setkaoschannel` first!",
@@ -91,10 +89,9 @@ export default {
     }
 
     const userData = db
-      .prepare<
-        {},
-        { tickets: number }
-      >("SELECT tickets FROM users WHERE userId = ?")
+      .prepare<{}, { tickets: number }>(
+        "SELECT tickets FROM users WHERE userId = ?"
+      )
       .get(userId);
 
     if (!userData || userData.tickets < 1) {
@@ -172,7 +169,9 @@ export default {
       const raceStatus = raceTrack
         .map(
           (boat) =>
-            `${colorMap[boat.id]}: ${"🌊".repeat(boat.progress)}<:rhib:1356949815837200465> ${
+            `${colorMap[boat.id]}: ${"🌊".repeat(
+              boat.progress
+            )}<:rhib:1356949815837200465> ${
               boat.finished ? `🏁 (Place: ${boat.place})` : ""
             }`
         )
@@ -186,9 +185,13 @@ export default {
     const won = userFinish!.place === 1;
 
     await interaction.followUp(
-      `🎉 **RHIB ${colorMap[userFinish!.id]} finished in position ${userFinish!.place}! ${
+      `🎉 **RHIB ${colorMap[userFinish!.id]} finished in position ${
+        userFinish!.place
+      }! ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
-      }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${userData.tickets - 1}**`
+      }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${
+        userData.tickets - 1
+      }**`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.points}]`,
@@ -197,12 +200,11 @@ export default {
 } satisfies extendedAPICommand;
 
 function getRandomWin(rewards: RaceReward[]) {
-  
-  const customRaceData = rewards.map(r => {
-    const config = raceData.find(rD => rD.position === r.position)
+  const customRaceData = rewards.map((r) => {
+    const config = raceData.find((rD) => rD.position === r.position);
 
-    return {points:r.points, position:r.position, odds: config?.odds}
-  })
+    return { points: r.points, position: r.position, odds: config?.odds };
+  });
 
   const weightedList = customRaceData.flatMap((item) =>
     Array(item.odds).fill(item.position)

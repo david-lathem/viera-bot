@@ -154,8 +154,17 @@ export default {
         "INSERT INTO users (userId, tickets, lastDailyClaimedTimestamp) VALUES (?, 1,  ?) ON CONFLICT(userId) DO UPDATE SET tickets = tickets + 1 , lastDailyClaimedTimestamp = ?"
       ).run(user.id, curDate, curDate);
 
+      const updatedData = db
+        .prepare<
+          {
+            userId: string;
+          },
+          UserData
+        >("SELECT * FROM users WHERE userId = @userId")
+        .get({ userId: user.id });
+
       return await interaction.reply(
-        `You now have ${userData?.tickets! + 1} tickets. Next claim at ${time(
+        `You now have ${updatedData!.tickets} tickets. Next claim at ${time(
           new Date(curDate + dayInMs),
           TimestampStyles.ShortDateTime
         )}`

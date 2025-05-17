@@ -189,9 +189,9 @@ export default {
         userFinish!.place
       }! ${
         won ? "🏆 You won!" : "😢 Better luck next time!"
-      }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${
+      }**\n**__Thanks for playing Ticket's Race.__** **Tickets left: ${
         userData.tickets - 1
-      }**`
+      }. You won ${userRandomPos.points} ${guildSettings.raceConfig.rewards}**`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.points}]`,

@@ -8,7 +8,6 @@ import {
 
 import db from "../database/index.js";
 import { extendedAPICommand } from "../utils/typings/types.js";
-import { isAuthorizedServer } from "../utils/perms.js";
 
 export default {
   name: "set_ticket_channel",
@@ -29,8 +28,6 @@ export default {
     if (!interaction.inCachedGuild()) return;
 
     const channel = interaction.options.getChannel("channel") as TextChannel;
-
-    isAuthorizedServer(interaction.guild);
 
     db.prepare(
       `INSERT INTO guildSettings (guildId, ticketChannelId)

@@ -2,7 +2,9 @@ declare global {
   namespace NodeJS {
     interface ProcessEnv {
       TOKEN: string;
-      GUILD_ID: string;
+      BOT_OWNER_ID: string;
+
+      KAOS_ITEM_IMG_BASE_URL: string;
     }
   }
 }

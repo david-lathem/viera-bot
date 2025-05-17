@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --env-file=.env dist/index.js",
-    "dev": "nodemon --env-file=.env dist/index.js -w dist",
+    "dev": "tsc-watch --onCompilationComplete  \"node --env-file=.env dist/index.js\" ",
     "build": "rimraf dist && tsc",
     "build:dev": "tsc -w"
   },
@@ -23,6 +23,7 @@
   "dependencies": {
     "@devraelfreeze/discordjs-pagination": "^2.7.6",
     "better-sqlite3": "^11.9.1",
-    "discord.js": "^14.18.0"
+    "discord.js": "^14.19.3",
+    "tsc-watch": "^6.2.1"
   }
 }

@@ -1,0 +1,1 @@
+export const defaultRewardsConfig = `'{"currency":"USD","rewards":[{"position":1,"points":1000000},{"position":2,"points":250000},{"position":3,"points":60000},{"position":4,"points":30000},{"position":5,"points":15000}]}'`;

@@ -1,14 +1,13 @@
 import {
   ApplicationCommandOptionType,
   ChatInputCommandInteraction,
-  EmbedBuilder,
   TextChannel,
 } from "discord.js";
 
 import db from "../database/index.js";
-import { extendedAPICommand } from "../utils/typings/types.js";
+import { extendedAPICommand, RaceReward, } from "../utils/typings/types.js";
 import raceData from "./../../race.json" with { type: "json" };
-import { isAuthorizedServer } from "../utils/perms.js";
+import { getGuildById } from "../database/queries.js";
 
 interface Boat {
   id: 1 | 2 | 3 | 4 | 5;
@@ -62,7 +61,6 @@ export default {
   execute: async (interaction: ChatInputCommandInteraction) => {
     if (!interaction.inCachedGuild()) return;
 
-    isAuthorizedServer(interaction.guild);
 
     const { user, guildId } = interaction;
 
@@ -71,15 +69,8 @@ export default {
     const serverNumber = interaction.options.getString("server_number", true);
     const rhib = interaction.options.getInteger("rhib", true);
 
-    const guildSettings = db
-      .prepare<
-        {},
-        {
-          guildId: string;
-          kaosCommandChannelId?: string;
-        }
-      >("SELECT * FROM guildSettings WHERE guildId = ?")
-      .get(guildId);
+    const guildSettings =getGuildById
+      .get({guildId});
 
     if (!guildSettings || !guildSettings.kaosCommandChannelId) {
       return await interaction.reply({
@@ -134,7 +125,7 @@ export default {
     const finishLine = 10;
     let finishedCount = 0;
 
-    const userRandomPos = getRandomWin();
+    const userRandomPos = getRandomWin(guildSettings.raceConfig.rewards);
 
     console.log(userRandomPos);
 
@@ -200,18 +191,25 @@ export default {
       }**\n**__Thanks for playing KING's Race.__** **Tickets left: ${userData.tickets - 1}**`
     );
     await channel.send({
-      content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.quantity}]`,
+      content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.points}]`,
     });
   },
 } satisfies extendedAPICommand;
 
-function getRandomWin() {
-  const weightedList = raceData.flatMap((item) =>
+function getRandomWin(rewards: RaceReward[]) {
+  
+  const customRaceData = rewards.map(r => {
+    const config = raceData.find(rD => rD.position === r.position)
+
+    return {points:r.points, position:r.position, odds: config?.odds}
+  })
+
+  const weightedList = customRaceData.flatMap((item) =>
     Array(item.odds).fill(item.position)
   );
 
   const randomIndex = Math.floor(Math.random() * weightedList.length);
   const winner = weightedList[randomIndex];
 
-  return raceData.find((t) => t.position === winner)!;
+  return customRaceData.find((t) => t.position === winner)!;
 }

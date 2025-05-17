@@ -1,4 +1,5 @@
 import { GuildMember } from "discord.js";
+import { RaceConfig } from "./typings/types.js";
 
 export const removeRoleWhenTicketZero = async (
   member: GuildMember,
@@ -17,3 +18,23 @@ export const removeRoleWhenTicketZero = async (
 
   await member.roles.set(newRoles);
 };
+
+export function formatRaceConfigDisplay(config: RaceConfig): string {
+  const { currency, rewards } = config;
+
+  const rewardLines = rewards
+    .sort((a, b) => a.position - b.position)
+    .map(({ position, points }) => {
+      const suffix =
+        position === 1
+          ? "st"
+          : position === 2
+          ? "nd"
+          : position === 3
+          ? "rd"
+          : "th";
+      return `**${position}${suffix}:** ${points} ${currency}`;
+    });
+
+  return `**Currency:** ${currency}\n\n**Rewards:**\n${rewardLines.join("\n")}`;
+}

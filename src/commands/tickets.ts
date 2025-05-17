@@ -5,12 +5,11 @@ import {
 } from "@devraelfreeze/discordjs-pagination";
 import db from "../database/index.js";
 import { removeRoleWhenTicketZero } from "../utils/misc.js";
-import { isAdmin, isAuthorizedServer } from "../utils/perms.js";
+import { isAdmin } from "../utils/perms.js";
 import { extendedAPICommand } from "../utils/typings/types.js";
 import {
   ChatInputCommandInteraction,
   ApplicationCommandOptionType,
-  User,
   time,
   TimestampStyles,
   EmbedBuilder,
@@ -117,8 +116,6 @@ export default {
     const recipient = interaction.options.getUser("to");
     const amount = interaction.options.getInteger("amount");
 
-    isAuthorizedServer(interaction.guild);
-
     if (
       subcommand !== "view" &&
       subcommand !== "leaderboards" &&
@@ -146,7 +143,10 @@ export default {
         userData.lastDailyClaimedTimestamp + dayInMs > curDate
       ) {
         return await interaction.reply(
-          `You have already claimed your daily ticket. Next claim at ${time(new Date(userData.lastDailyClaimedTimestamp + dayInMs), TimestampStyles.ShortDateTime)}`
+          `You have already claimed your daily ticket. Next claim at ${time(
+            new Date(userData.lastDailyClaimedTimestamp + dayInMs),
+            TimestampStyles.ShortDateTime
+          )}`
         );
       }
 
@@ -155,7 +155,10 @@ export default {
       ).run(user.id, curDate, curDate);
 
       return await interaction.reply(
-        `You now have ${userData?.tickets! + 1} tickets. Next claim at ${time(new Date(curDate + dayInMs), TimestampStyles.ShortDateTime)}`
+        `You now have ${userData?.tickets! + 1} tickets. Next claim at ${time(
+          new Date(curDate + dayInMs),
+          TimestampStyles.ShortDateTime
+        )}`
       );
     }
 
@@ -238,10 +241,9 @@ export default {
 
     if (subcommand === "leaderboards") {
       const topUsers = db
-        .prepare<
-          {},
-          UserData
-        >("SELECT userId, tickets FROM users WHERE tickets > 0 ORDER BY tickets DESC")
+        .prepare<{}, UserData>(
+          "SELECT userId, tickets FROM users WHERE tickets > 0 ORDER BY tickets DESC"
+        )
         .all({});
 
       if (topUsers.length === 0) {

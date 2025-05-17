@@ -171,7 +171,7 @@ export default {
           (boat) =>
             `${colorMap[boat.id]}: ${"🌊".repeat(
               boat.progress
-            )}<:rhib:1356949815837200465> ${
+            )}<:rhib:1373359277837783181> ${
               boat.finished ? `🏁 (Place: ${boat.place})` : ""
             }`
         )
@@ -191,7 +191,7 @@ export default {
         won ? "🏆 You won!" : "😢 Better luck next time!"
       }**\n**__Thanks for playing Ticket's Race.__** **Tickets left: ${
         userData.tickets - 1
-      }. You won ${userRandomPos.points} ${guildSettings.raceConfig.rewards}**`
+      }. You won ${userRandomPos.points} ${guildSettings.raceConfig.currency}**`
     );
     await channel.send({
       content: `[KAOS][ADD][<@${interaction.user.id}>][${serverNumber}]=[POINTS][${userRandomPos.points}]`,

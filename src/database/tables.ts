@@ -5,7 +5,8 @@ db.exec(
   `
   CREATE TABLE IF NOT EXISTS users (
     userId TEXT PRIMARY KEY,
-    tickets INTEGER DEFAULT 0
+    tickets INTEGER DEFAULT 0,
+    lastDailyClaimedTimestamp INTEGER
   )
 `
 );

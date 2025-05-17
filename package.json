@@ -24,6 +24,7 @@
     "@devraelfreeze/discordjs-pagination": "^2.7.6",
     "better-sqlite3": "^11.9.1",
     "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
     "tsc-watch": "^6.2.1"
   }
 }
